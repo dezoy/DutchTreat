@@ -1,202 +1,134 @@
 <!DOCTYPE html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dutch treat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        #step_2, #step_finish {
-            display:none;
-        }
-        #prev_step_1, #prev_step_2 {
-            float:left;
-        }
-        #next_step_2 {
-            float:right;
-            /*
-            padding:5px 10px;
-            background:#ffffff;
-            border: 1px solid #ddd;
-        */
-        }
-        #next_step_finish {
-            float: right;
-        }
-        #adding-list ul, #amount-list ul, #finish-list ul {
-            padding-left:5px;
-        }
-        #adding-list li, #amount-list li, #finish-list li {
-            list-style:none;
-            position: relative;
-            font-size: 24px;
-            border-bottom: 1px dotted #ccc;
-            padding:5px;
-        }
-        #amount-list, #finish-list {
-            clear: both;
-        }
-        #amount-list li {
-            cursor:pointer;
-        }
-        #amount-list li.active {
-            border-bottom: 1px solid blue;
-        }
-        #people, #sum {
-            position: relative;
-            margin: 0;
-            width: 100%;
-            font-size: 24px;
-            font-family: inherit;
-            line-height: 1.4em;
-            border: 0;
-            outline: none;
-            color: inherit;
-            padding: 6px;
-            border: 1px solid #999;
-            box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2);
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            -ms-box-sizing: border-box;
-            -o-box-sizing: border-box;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-font-smoothing: antialiased;
-            -ms-font-smoothing: antialiased;
-            -o-font-smoothing: antialiased;
-            font-smoothing: antialiased;
-            padding: 5px;
-            /*border: none;
-          background: rgba(0, 0, 0, 0.02);*/
-            border: 1px dotted #ddd;
-            background-color: white;
-            z-index: 2;
-            box-shadow: none;
-        }
-    </style>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            var data = [];
-            $('#step_1').find('#people').focus();
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Dutch treat</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="./style.css">
+	<script src="./jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			var data = [];
+			$('#step_1').find('#people').focus();
 
-            $('#people').on('keyup', function (evt) {
-                var key = evt.keyCode || evt.which,
-                    name = $(this).val();
-                if (key === 13) {
-                    data.push({
-                        name: name,
-                        sum: [],
-                        div: 0,
-                        amount:0,
-                        sums: []
-                    });
-                    $('#adding-list').find('ul').html('');
-                    $.each(data, function (i, v) {
-                        $('#adding-list').find('ul').append('<li data-uid="' + i + '">' + this.name + '</li>');
-                    });
-                    if (data.length > 1) {
-                        $('#next_step_2').removeAttr('disabled');
-                    } else {
-                        $('#next_step_2').attr('disabled', 'disabled');
-                    }
-                    $(this).val('');
-                }
-            });
+			$('#people').on('keyup', function (evt) {
+				var key = evt.keyCode || evt.which,
+					name = $(this).val();
+				if (key === 13) {
+					data.push({
+						name: name,
+						sum: [],
+						div: 0,
+						amount:0,
+						sums: []
+					});
+					$('#adding-list').find('ul').html('');
+					$.each(data, function (i, v) {
+						$('#adding-list').find('ul').append('<li data-uid="' + i + '">' + this.name + '</li>');
+					});
+					if (data.length > 1) {
+						$('#next_step_2').removeAttr('disabled');
+					} else {
+						$('#next_step_2').attr('disabled', 'disabled');
+					}
+					$(this).val('');
+				}
+			});
 
-            $('#prev_step_1').on('click', function () {
-                $('#step_1').show();
-                $('#step_2').hide();
-                $('#people').focus();
-            });
-            $('#next_step_2').on('click', function () {
-                $('#amount-list').find('ul').html('');
-                $('#step_1').hide();
-                $('#step_2').show();
-                $.each(data, function () {
-                    $('#amount-list').find('ul').append('<li><label>' + this.name + ': 0</label></li>');
-                });
-                $('#sum').on('keyup', function (evt) {
-                    var key = evt.keyCode || evt.which,
-                        sum = parseInt($(this).val()),
-                        str = '',
-                        len = data.length - 1;
-                    if (key === 13) {
-                        $('#amount-list').find('li').each(function (i, v) {
-                            if ($(this).hasClass('active')) {
-                                data[i].sum.push(sum);
-                                amount = (data[i].amount + sum).toFixed(2);
-                                data[i].div = (amount / (len + 1)).toFixed(2);
-                            }
-                            var amount = 0;
-                            $.each(data[i].sum, function () {
-                                amount += this;
-                            });
-                            str += '<li>' + data[i].name + ': ' + amount + '</li>';
-                            if (i == len) {
-                                $('#amount-list').find('ul').html('').append(str);
-                            }
-                        });
-                        $(this).val('');
-                    }
-                });
-            });
-            
-            $('#prev_step_2').on('click', function(){
-                $('#step_2').show();
-                $('#step_finish').hide();
-            });
-            
-            $('#next_step_finish').on('click', function () {
-                var len = data.length - 1,
-                    str = '';
-                $.each(data, function (k, vs) {
-                    $.each(data, function (i, v) {
-                        if (k != i) {
-                            if (data[k].div > data[i].div) {
-                                data[i].sums[k] = (data[k].div - data[i].div).toFixed(2);
-                                str += '<li>'+data[i].name+' &rarr; '+data[k].name+': '+data[i].sums[k]+'</li>';
-                            }
-                        }
-                    });
-                    if (k == len) {
-                        $('#step_2').hide();
-                        $('#step_finish').show();
-                        $('#finish-list').find('ul').html('').append(str);
-                    }
-                });
-            });
+			$('#prev_step_1').on('click', function () {
+				$('#step_1').show();
+				$('#step_2').hide();
+				$('#people').focus();
+			});
+			$('#next_step_2').on('click', function () {
+				$('#amount-list').find('ul').html('');
+				$('#step_1').hide();
+				$('#step_2').show();
+				$.each(data, function () {
+					$('#amount-list').find('ul').append('<li><label>' + this.name + ': 0</label></li>');
+				});
+				$('#sum').on('keyup', function (evt) {
+					var key = evt.keyCode || evt.which,
+						sum = parseInt($(this).val()),
+						str = '',
+						len = data.length - 1;
+					if (key === 13) {
+						$('#amount-list').find('li').each(function (i, v) {
+							if ($(this).hasClass('active')) {
+								data[i].sum.push(sum);
+								amount = (data[i].amount + sum).toFixed(2);
+								data[i].div = (amount / (len + 1)).toFixed(2);
+							}
+							var amount = 0;
+							$.each(data[i].sum, function () {
+								amount += this;
+							});
+							str += '<li>' + data[i].name + ': ' + amount + '</li>';
+							if (i == len) {
+								$('#amount-list').find('ul').html('').append(str);
+							}
+						});
+						$(this).val('');
+					}
+				});
+			});
+			
+			$('#prev_step_2').on('click', function(){
+				$('#step_2').show();
+				$('#step_finish').hide();
+			});
+			
+			$('#next_step_finish').on('click', function () {
+				var len = data.length - 1,
+					str = '';
+				$.each(data, function (k, vs) {
+					$.each(data, function (i, v) {
+						if (k != i) {
+							if (data[k].div > data[i].div) {
+								data[i].sums[k] = (data[k].div - data[i].div).toFixed(2);
+								str += '<li>'+data[i].name+' &rarr; '+data[k].name+': '+data[i].sums[k]+'</li>';
+							}
+						}
+					});
+					if (k == len) {
+						$('#step_2').hide();
+						$('#step_finish').show();
+						$('#finish-list').find('ul').html('').append(str);
+					}
+				});
+			});
 
-            $('#amount-list').on('click', 'li', function () {
-                if (!$(this).hasClass('active')) {
-                    $(this).addClass('active');
-                } else {
-                    $(this).removeClass('active');
-                }
-                $('#sum').focus();
-            });
-        });
-    </script>
+			$('#amount-list').on('click', 'li', function () {
+				if (!$(this).hasClass('active')) {
+					$(this).addClass('active');
+				} else {
+					$(this).removeClass('active');
+				}
+				$('#sum').focus();
+			});
+		});
+	</script>
 </head>
 <body>
-    <div id="step_1">
-        <button id="next_step_2" disabled="disabled">Дальше</button>
-        <input type="text" value="" name="people" id="people" placeholder="Имя" />
-        <div id="adding-list">
-            <ul></ul>
-        </div>
-    </div>
-    <div id="step_2">
-        <button id="prev_step_1">Назад</button>
-        <button id="next_step_finish">Считать</button>
-        <input type="text" value="" name="sum" id="sum" placeholder="Сумма" />
-        <div id="amount-list">
-            <ul></ul>
-        </div>
-    </div>
-    <div id="step_finish">
-        <button id="prev_step_2">Назад</button>
-        <div id="finish-list">
-            <ul></ul>
-        </div>
-    </div>
+	<div id="step_1">
+		<button id="next_step_2" disabled="disabled">Дальше</button>
+		<input type="text" value="" name="people" id="people" placeholder="Имя" />
+		<div id="adding-list">
+			<ul></ul>
+		</div>
+	</div>
+	<div id="step_2">
+		<button id="prev_step_1">Назад</button>
+		<button id="next_step_finish">Считать</button>
+		<input type="text" value="" name="sum" id="sum" placeholder="Сумма" />
+		<div id="amount-list">
+			<ul></ul>
+		</div>
+	</div>
+	<div id="step_finish">
+		<button id="prev_step_2">Назад</button>
+		<div id="finish-list">
+			<ul></ul>
+		</div>
+	</div>
 </body>
